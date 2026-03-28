@@ -1,7 +1,7 @@
 ---
 title: "Self-reported life satisfaction, 2011 to 2023"
 subtitle: "Replicating the Our World in Data Grapher"
-author: "YOUR NAME HERE" # Remember to add your name!
+author: "Yabi Bereket" 
 theme: united
 ---
 
@@ -44,7 +44,7 @@ The main life evaluation question asked in the poll is the Cantril Life Ladder q
 
 > “Please imagine a ladder, with steps numbered from 0 at the bottom to 10 at the top. The top of the ladder represents the best possible life for you and the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?”
 
-
+:::{.panel-tabset}
 ## 🔢 Table
 
 **Average self-reported life satisfaction** – Cantril Ladder score (0=worst; 10=best)
@@ -63,7 +63,23 @@ The main life evaluation question asked in the poll is the Cantril Life Ladder q
 # 5. Also with `mutate`, you should round your numbers to appropriate decimal places.
 # 6. Then use scales::percent to format the Relative change as a percentage.
 # 7. Use the `reactable` function to create and output the table.
-"WRITE_YOUR_CODE_HERE"
+
+final_table <- cantril%>%
+  select(-Code)%>%
+  filter(Year == 2011 | Year == 2023)%>%
+  pivot_wider(
+    names_from = Year, 
+    values_from = `Cantril ladder score`
+  )%>%
+  mutate(
+    abs_change = round(`2023`-`2011`,2), 
+    rel_change = percent(round((`2023`-`2011`)/(`2011`),2))
+  )
+
+reactable(final_table)
+  
+
+
 ```
 
 
@@ -109,9 +125,29 @@ cantril %>%
 # 6. Use theme_minimal to set the theme.
 # 7. Finally, use ggplotly to convert the ggplot chart to a plotly chart
 
-"WRITE_YOUR_CODE_HERE"
-# (When you're done with this section, don't forget to add tabsets, as mentioned in the instructions.)
+
+
+
+cantril_sub <- cantril%>%
+  filter(Country %in% c("Ethiopia", "Kenya", "Djibouti", "Sudan", "Somalia"))
+
+line_graph <- ggplot(data = cantril_sub,aes(x = Year, y = `Cantril ladder score`, colour = Country))+
+  geom_line()+
+  scale_y_continuous(limits = c(0,10))+
+  labs(
+    title = "Changes in Cantril Score Across East African Countries (2011-2023)", 
+    subtitle = "Countries: Djibouti, Ethiopia, Kenya, Somalia, and Sudan", 
+    x = "Year", 
+    y = "Cantril Score"
+  )+
+  theme_minimal()
+
+ggplotly(p = line_graph)
+
+
+# geom_point()# (When you're done with this section, don't forget to add tabsets, as mentioned in the instructions.)
 ```
+:::
 
 ## 📈 Advanced Chart
 
